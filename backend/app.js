@@ -1,63 +1,106 @@
+require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
-const { celebrate, Joi, errors } = require('celebrate');
-const routerUser = require('./routes/users');
-const routerCards = require('./routes/cards');
+
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const { errors, celebrate, Joi } = require('celebrate');
+
+const usersRoutes = require('./routes/users');
+const cardRoutes = require('./routes/cards');
 const auth = require('./middlewares/auth');
-const { createUser, login } = require('./controllers/users');
-const helmet = require('helmet');
-const rateLimit = require("express-rate-limit");
-mongoose.connect('mongodb://localhost:27017/mestodb');
-const { PORT = 3000 } = process.env;
+const { login, createUser } = require('./controllers/users');
+const NotFoundError = require('./errors/not-found-error');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+
+const allowedCors = [
+
+];
+
+app.use(cors({
+  origin: allowedCors,
+}));
+
+const { PORT = 3000 } = process.env;
+
+mongoose.connect('mongodb://localhost:27017/mestodb', {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+  useUnifiedTopology: true,
 });
-app.use(limiter);
-app.use(express.json());
-app.use(cookieParser());
-app.use(helmet());
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().default('Жак-Ив Кусто').min(2).max(30),
-    about: Joi.string().default('Исследователь').min(2).max(30),
-    avatar: Joi.string().default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png').pattern(/^(http|https):\/\/[^ "]+\.[^ "]+$/),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-}), createUser);
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-}), login);
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+  if (req.method === 'OPTIONS') {
+    res.status(200).send();
+    return;
+  }
+  next();
+});
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
+app.use(requestLogger);
+app.post(
+  '/signup',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().required().email(),
+      password: Joi.string().required()
+        .pattern(new RegExp('^[A-Za-z0-9]{8,30}$')),
+      name: Joi.string().min(2).max(30),
+      about: Joi.string().min(2).max(30),
+      avatar: Joi.string()
+        .regex(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/),
+    }),
+  }),
+  createUser,
+);
+app.post(
+  '/signin',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().required().email(),
+      password: Joi.string().required(),
+    }),
+  }),
+  login,
+);
 app.use(auth);
-app.use('/', routerUser);
-app.use('/', routerCards);
-app.use('*', (req, res, next) => {
-  const err = new Error('Cтраница не найдена');
-  err.statusCode = 404;
-
-  next(err);
+app.use('/', usersRoutes);
+app.use('/', cardRoutes);
+app.use('*', () => {
+  throw new NotFoundError('Запрашиваемый ресурс не найден');
 });
-
+app.use(errorLogger);
 app.use(errors());
 
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
+  console.log(err);
+  if (err.kind === 'ObjectId') {
+    res.status(400).send({
+      message: 'Неверно переданы данные',
     });
+  } else {
+    res.status(statusCode).send({
+      message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
+    });
+  }
 });
 
 app.listen(PORT, () => {
