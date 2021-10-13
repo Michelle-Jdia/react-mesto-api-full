@@ -54,21 +54,16 @@ app.get('/crash-test', () => {
 });
 
 app.use(requestLogger);
-app.post(
-  '/signup',
-  celebrate({
-    body: Joi.object().keys({
-      email: Joi.string().required().email(),
-      password: Joi.string().required()
-        .pattern(new RegExp('^[A-Za-z0-9]{8,30}$')),
-      name: Joi.string().min(2).max(30),
-      about: Joi.string().min(2).max(30),
-      avatar: Joi.string()
-        .regex(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/),
-    }),
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().pattern(/https?:\/\/(www\.)?[a-zA-Z0-9\-.]{1,}\.[a-z]{1,5}([/a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=]*)/),
   }),
-  createUser,
-);
+}), createUser);
+
 app.post(
   '/signin',
   celebrate({
@@ -89,19 +84,12 @@ app.use(errorLogger);
 app.use(errors());
 
 // eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  console.log(err);
-  if (err.kind === 'ObjectId') {
-    res.status(400).send({
-      message: 'Неверно переданы данные',
-    });
-  } else {
-    res.status(statusCode).send({
-      message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
-    });
-  }
-});
+const errorHandler = (err, req, res, next) => {
+  const status = err.statusCode || 500;
+  const { message } = err;
+  res.status(status).join({ err: message || 'ощибка на сервере' });
+  return next();
+};
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
