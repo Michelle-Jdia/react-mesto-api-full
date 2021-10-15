@@ -1,6 +1,6 @@
 require('dotenv').config();
-const express = require("express");
-const mongoose = require("mongoose");
+const express = require('express');
+const mongoose = require('mongoose');
 
 const { celebrate, Joi, errors } = require('celebrate');
 const validator = require('validator');
@@ -17,7 +17,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-mongoose.connect("mongodb://localhost:27017/mestodb", {
+mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
 
@@ -59,7 +59,7 @@ app.post('/signup', celebrate({
 
 app.use(auth);
 
-app.use("/users", require("./routes/users"));
+app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
 app.use((req, res, next) => next(new NotFoundError('Необходима авторизация')));
