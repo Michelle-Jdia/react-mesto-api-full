@@ -85,7 +85,7 @@ class Api {
 }
 
 const api = new Api({
-	address: 'mest.michelle.nomoredomains.club',
+	address: 'http://api.domainname.michelle.nomoredomains.monster',
 	headers: {
 		'Accept': 'application/json',
 		'Content-Type': 'application/json',
