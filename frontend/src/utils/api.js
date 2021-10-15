@@ -85,10 +85,10 @@ class Api {
 }
 
 const api = new Api({
-	address: 'https://mesto.nomoreparties.co/v1/cohort-22',
+	address: 'mest.michelle.nomoredomains.club',
 	headers: {
-		authorization: 'c978f897-d705-4f1d-8b98-36c9feaeed93',
-		'Content-type': 'application/json'
+		'Accept': 'application/json',
+		'Content-Type': 'application/json',
 	}
 });
 export default api;

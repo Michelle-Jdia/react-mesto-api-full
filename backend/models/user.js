@@ -1,69 +1,45 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const validator = require('validator');
-const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
+    required: false,
     minlength: 2,
     maxlength: 30,
-    default: 'Michelle Jdia',
+    default: "Жак-Ив Кусто",
   },
   about: {
     type: String,
+    required: false,
     minlength: 2,
     maxlength: 30,
-    default: 'Developer',
+    default: "Исследователь",
   },
   avatar: {
     type: String,
     validate: {
-      validator(v) {
-        return /^(http:\/\/|https:\/\/w*\w)/.test(v);
-      },
-      message: 'Ссылка некорректна',
+      validator: (v) => validator.isURL(v),
+      message: "Введите ссылку на изображение",
     },
-    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    required: false,
+    default:
+      "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
   },
   email: {
     type: String,
-    required: true,
     unique: true,
+    required: true,
     validate: {
-      validator(v) {
-        return validator.isEmail(v);
-      },
-      message: 'введите правильный email',
+      validator: (v) => validator.isEmail(v),
+      message: "Неправильный формат почты",
     },
   },
   password: {
     type: String,
     required: true,
     select: false,
-    minlength: 8,
-    validate: {
-      validator(v) {
-        return validator.isStrongPassword(v);
-      },
-      message: 'Ваш пароль не является надежным',
-    },
   },
 });
 
-userSchema.statics.findUserByCredentials = function (email, password) {
-  return this.findOne({ email }).select('+password')
-    .then((user) => {
-      if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
-      }
-      return bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
-            return Promise.reject(new Error('Неправильные почта или пароль'));
-          }
-          return user;
-        });
-    });
-};
-
-module.exports = mongoose.model('user', userSchema);
+module.exports = mongoose.model("user", userSchema);
