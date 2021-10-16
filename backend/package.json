@@ -1,7 +1,7 @@
 {
   "name": "express-mesto",
   "version": "1.0.0",
-  "description": "",
+  "description": "## Директории",
   "main": "index.js",
   "scripts": {
     "lint": "npx eslint",
@@ -9,11 +9,15 @@
     "start": "node app.js"
   },
   "repository": {
-    "type": "git"
+    "type": "git",
+    "url": "git+https://github.com/tyumen-777/express-mesto.git"
   },
-  "author": "Michelle Jdia",
+  "author": "",
   "license": "ISC",
-  "bugs": {},
+  "bugs": {
+    "url": "https://github.com/tyumen-777/express-mesto/issues"
+  },
+  "homepage": "https://github.com/tyumen-777/express-mesto#readme",
   "devDependencies": {
     "eslint": "^7.29.0",
     "eslint-config-airbnb-base": "^14.2.1",
@@ -21,7 +25,6 @@
     "nodemon": "^2.0.7"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "celebrate": "^14.0.0",
@@ -29,11 +32,9 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-winston": "^4.1.0",
-    "i": "^0.3.7",
     "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.0.11",
-    "npm": "^8.1.0",
+    "mongoose": "^5.12.14",
     "validator": "^13.6.0",
     "winston": "^3.3.3"
   }

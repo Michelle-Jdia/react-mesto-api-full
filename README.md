@@ -1,9 +1,6 @@
 # react-mesto-api-full
 
 id: 84.201.129.89
+frontend : mest.michelle.nomoredomains.club
 
-http://mest.michelle.nomoredomains.club
-api.domainname.michelle.nomoredomains.monster
-Репозиторий для приложения проекта `Mesto`, включающий фронтенд и бэкенд части приложения со следующими возможностями: авторизации и регистрации пользователей, операции с карточками и пользователями. Бэкенд расположите в директории `backend/`, а фронтенд - в `frontend/`.
-
-Пожалуйста, прикрепите в это описание ссылку на сайт, размещенный на Яндекс.Облаке.
+backend: api.domainname.michelle.nomoredomains.monster

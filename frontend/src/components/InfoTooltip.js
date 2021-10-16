@@ -1,21 +1,16 @@
 import React from 'react';
-import success from '../images/success.svg';
-import fail from '../images/fail.svg';
-export default InfoTooltip;
-function InfoTooltip(props) {
-	return (
-		<div className={`popup ${props.isOpen ? 'popup__opened' : ''}`}>
-			<div className="popup__condition-container">
-				<img
-					className="popup__condition-image"
-					src={props.status ? success : fail}
-					alt={props.status ? 'Успешно' : 'Ошибка'}
-				/>
-				<p className="popup__condition-text">
-					{props.status ? 'Вы успешно зарегистрировались!' : 'Что-то пошло не так! Попробуйте ещё раз.'}
-				</p>
-				<button className="popup__close" type="reset" onClick={props.onClose} />
-			</div>
-		</div>
-	);
+
+
+function InfoTooltip({onClose, isOpen, message}) {
+    return (
+        <div className={`popup popup_type_infotool ${isOpen ? 'popup__opened' : ''}`}>
+            <div className="popup__container">
+                <img src={message.iconPath} alt="Картинка Yes или No" className="popup__result-icon"/>
+                <p className="popup__title-info">{message.text}</p>
+                <button type="button" className="popup__button-close" onClick={onClose}/>
+            </div>
+        </div>
+    );
 }
+
+export default InfoTooltip;

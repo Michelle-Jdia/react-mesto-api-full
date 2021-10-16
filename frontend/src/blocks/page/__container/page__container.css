@@ -1,0 +1,26 @@
+.page__container {
+  min-width: 300px;
+  max-width: 880px;
+  color: white;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: Inter , Arial , sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+@media screen and (max-width: 560px) {
+  .page__container {
+    margin-right:auto;
+    margin-left: auto;
+  }
+}
+
