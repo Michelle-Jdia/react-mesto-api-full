@@ -41,12 +41,6 @@ const userSchema = new mongoose.Schema({
     required: true,
     select: false,
     minlength: 8,
-    validate: {
-      validator(v) {
-        return validator.isStrongPassword(v);
-      },
-      message: 'Ваш пароль не является надежным',
-    },
   },
 });
 
