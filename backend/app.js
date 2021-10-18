@@ -14,8 +14,10 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 const { PORT = 3000 } = process.env;
 
 const app = express();
+// СПАСИБО ЗА ПРОВЕРКУ
+//Я ВСЕ ТАКИЕ НЕ ПОЙМУ ПОЧЕМУ НЕ ПОЛУЧАЕТСЯ ЗАРЕГСТРИРОВАТЬСЯ
+//Я ПРОБОВАЛ УЖЕ 3 РАЗНЫХ ПРОЕКТОВ ПО BACKEND !! ЭТО КАКИЕ ТО НАСТРОЙКИ В ТЕРМЕНАЛЕ SERVER ?
 
-// Настройки cors
 app.use(cors({
   origin: [
     'https://mest.michelle.nomoredomains.club',
