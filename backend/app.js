@@ -1,102 +1,88 @@
 require('dotenv').config();
-
 const express = require('express');
 const mongoose = require('mongoose');
-
-const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const { celebrate, Joi, errors } = require('celebrate');
 const cors = require('cors');
-const { errors, celebrate, Joi } = require('celebrate');
-
-const usersRoutes = require('./routes/users');
-const cardRoutes = require('./routes/cards');
+const helmet = require('helmet');
+const routerUser = require('./routes/users');
+const routerCards = require('./routes/cards');
 const auth = require('./middlewares/auth');
-const { login, createUser } = require('./controllers/users');
-const NotFoundError = require('./errors/not-found-error');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { createUser, login } = require('./controllers/users');
+mongoose.connect('mongodb://localhost:27017/mestodb');
+const { PORT = 3000 } = process.env;
 
 const app = express();
 
-const allowedCors = [
-  'https://api.domainname.michelle.nomoredomains.monster',
-  'https://mest.michelle.nomoredomains.club',
-  'https://localhost:3000',
-];
-
+// Настройки cors
 app.use(cors({
-  origin: allowedCors,
+  origin: [
+    'https://mest.michelle.nomoredomains.club',
+    'http://mest.michelle.nomoredomains.club',
+    'http://localhost:3001',
+    'https://localhost:3001',
+    'http://localhost:3000',
+    'https://localhost:3000',
+    'http://84.201.129.89',
+    'https://84.201.129.89',
+  ],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
 }));
-
-const { PORT = 3000 } = process.env;
-
-mongoose.connect('mongodb://localhost:27017/mestodb', {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-  useUnifiedTopology: true,
-});
-
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-  if (req.method === 'OPTIONS') {
-    res.status(200).send();
-    return;
-  }
-  next();
-});
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(helmet());
+app.use(express.json());
+app.use(cookieParser());
 
 app.use(requestLogger);
-app.post(
-  '/signup',
-  celebrate({
-    body: Joi.object().keys({
-      email: Joi.string().required().email(),
-      password: Joi.string().required()
-        .pattern(new RegExp('^[A-Za-z0-9]{8,30}$')),
-      name: Joi.string().min(2).max(30),
-      about: Joi.string().min(2).max(30),
-      avatar: Joi.string()
-        .regex(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/),
-    }),
+
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().default('Жак-Ив Кусто').min(2).max(30),
+    about: Joi.string().default('Исследователь').min(2).max(30),
+    avatar: Joi.string().default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png').pattern(/^(http|https):\/\/[^ "]+\.[^ "]+$/),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
   }),
-  createUser,
-);
-app.post(
-  '/signin',
-  celebrate({
-    body: Joi.object().keys({
-      email: Joi.string().required().email(),
-      password: Joi.string().required(),
-    }),
+}), createUser);
+
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
   }),
-  login,
-);
-app.use(auth);
-app.use('/', usersRoutes);
-app.use('/', cardRoutes);
-app.use('*', () => {
-  throw new NotFoundError('Запрашиваемый ресурс не найден');
+}), login);
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
 });
+
+app.use(auth);
+app.use('/', routerUser);
+app.use('/', routerCards);
+app.use('*', (req, res, next) => {
+  const err = new Error('Cтраница не найдена');
+  err.statusCode = 404;
+
+  next(err);
+});
+
 app.use(errorLogger);
+
 app.use(errors());
 
-// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
-  console.log(err);
-  if (err.kind === 'ObjectId') {
-    res.status(400).send({
-      message: 'Неверно переданы данные',
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
     });
-  } else {
-    res.status(statusCode).send({
-      message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
-    });
-  }
+  next();
 });
 
 app.listen(PORT, () => {

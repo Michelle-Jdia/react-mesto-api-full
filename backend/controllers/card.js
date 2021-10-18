@@ -1,83 +1,107 @@
 const Card = require('../models/card');
-const NotFoundError = require('../errors/not-found-error');
-const BadRequestError = require('../errors/bad-request-error');
-const Forbidden = require('../errors/forbidden');
 
-const getCards = (req, res, next) => {
-  Card.find({})
-    .then((cards) => {
-      res.status(200).send(cards);
-    })
-    .catch(next);
-};
-
-const createCard = (req, res, next) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
-  const owner = req.user._id;
-  Card.create({ name, link, owner })
-    .then((card) => {
-      res.status(200).send(card);
-    })
+
+  Card.create({ name, link, owner: req.user })
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError(err.message);
+        const errNew = new Error('Переданы некорректные данные при создании карточки');
+        errNew.statusCode = 400;
+
+        next(errNew);
       }
-      res.status(500).send({ message: `Внутренняя ошибка сервера: ${err}` });
-    })
+      next(err);
+    });
+};
+
+module.exports.findAllCards = (req, res, next) => {
+  Card.find({})
+    .then((card) => res.send({ data: card }))
     .catch(next);
 };
 
-const deleteCard = (req, res, next) => {
-  const id = req.user._id;
+module.exports.findByIdAndRemoveCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw new NotFoundError('Нет карточки с таким id');
-      }
-      if (card.owner.toString() !== id) {
-        throw new Forbidden('Нет прав для удаления карточки');
+        const err = new Error('Карточка с указанным _id не найден');
+        err.statusCode = 404;
+
+        next(err);
+      } else if (req.user._id !== card.owner.toString()) {
+        const errNew = new Error('Отказано в доступе');
+        errNew.statusCode = 403;
+
+        next(errNew);
       } else {
-        Card.findByIdAndDelete(req.params.cardId)
-          // eslint-disable-next-line no-shadow
-          .then((card) => {
-            res.status(200).send(card);
-          })
-          .catch(next);
+        card.remove().then(() => res.send({ data: card }));
       }
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        const errNew = new Error('Переданы некорректные данные');
+        errNew.statusCode = 400;
+
+        next(errNew);
+      }
+      next(err);
+    });
 };
 
-const likeCard = (req, res, next) => {
-  const owner = req.user._id;
+module.exports.likeCard = (req, res, next) => {
+  Card.findByIdAndUpdate(
 
-  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: owner } }, { new: true })
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true },
+  )
     .then((card) => {
       if (!card) {
-        throw new NotFoundError('Нет карточки с таким id');
+        const err = new Error('Пользователь с указанным _id не найден');
+        err.statusCode = 404;
+
+        next(err);
+      } else {
+        res.send(card);
       }
-      res.send(card);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        const errNew = new Error('Переданы некорректные данные для постановки лайка');
+        errNew.statusCode = 400;
+
+        next(err);
+      }
+      next(err);
+    });
 };
 
-const dislikeCard = (req, res, next) => {
-  const owner = req.user._id;
+module.exports.dislikeCard = (req, res, next) => {
+  Card.findByIdAndUpdate(
 
-  Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: owner } }, { new: true })
+    req.params.cardId,
+    { $pull: { likes: req.user._id } },
+    { new: true },
+  )
     .then((card) => {
       if (!card) {
-        throw new NotFoundError('Нет карточки с таким id');
-      }
-      res.send(card);
-    })
-    .catch(next);
-};
+        const err = new Error('Пользователь с указанным _id не найден');
+        err.statusCode = 404;
 
-module.exports = {
-  getCards,
-  createCard,
-  deleteCard,
-  likeCard,
-  dislikeCard,
+        next(err);
+      } else {
+        res.send(card);
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        const errNew = new Error('Переданы некорректные данные для снятия лайка');
+        errNew.statusCode = 400;
+
+        next(errNew);
+      }
+      next(err);
+    });
 };

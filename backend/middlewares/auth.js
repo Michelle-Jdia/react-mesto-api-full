@@ -1,19 +1,24 @@
 const jwt = require('jsonwebtoken');
 
 const { JWT_SECRET, NODE_ENV } = process.env;
-
-const NotAuthError = require('../errors/not-auth-error');
-
 module.exports = (req, res, next) => {
-  const token = req.cookies.jwt;
-  if (!token) {
-    throw new NotAuthError('Необходима авторизация');
+  if (!req.cookies.jwt) {
+    const err = new Error('Необходима авторизация');
+    err.statusCode = 401;
+
+    next(err);
   }
+
+  const token = (req.cookies.jwt);
   let payload;
+
   try {
-    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'super-strong-secret');
   } catch (err) {
-    throw new NotAuthError('Неверный токен');
+    const errNew = new Error('Ошибка авторизации');
+    errNew.statusCode = 401;
+
+    next(errNew);
   }
   req.user = payload;
   next();
