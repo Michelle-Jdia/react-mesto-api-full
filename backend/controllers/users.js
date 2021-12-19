@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
@@ -187,8 +188,7 @@ module.exports.login = (req, res, next) => {
       res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
-        sameSite: 'None',
-        secure: true,
+        sameSite: true,
       })
         .status(200)
         .send({ token, message: 'Пользователь успешно зарегистрирован' });

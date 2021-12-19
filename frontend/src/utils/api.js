@@ -92,10 +92,9 @@ class Api {
     }
   }
 }
-
-
+// process.env.NODE_ENV === 'production' ? 'https://api.domainname.michelle.nomoredomains.monster' :
 const api = new Api({
-  address: 'https://api.domainname.michelle.nomoredomains.monster',
+  address: 'http://localhost:5000',
   headers: {
     'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
     'Content-type': 'application/json',

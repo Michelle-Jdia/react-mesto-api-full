@@ -7,8 +7,8 @@ import registrationOk from '../images/authorization-ok.svg'
 import registrationWrong from '../images/authorization-bad.svg'
 
 import api from "../utils/api";
-import {CurrentUserContext} from "../contexts/CurrentUserContext";
-import {Route, Switch, Redirect, useHistory} from 'react-router-dom'
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import { Route, Switch, Redirect, useHistory } from 'react-router-dom'
 
 import Footer from "./Footer";
 import EditProfilePopup from "./EditProfilePopup";
@@ -29,10 +29,10 @@ function App() {
   const [isTooltipOpen, setIsTooltipOpen] = React.useState(false)
 
   const [selectedCard, setSelectedCard] = React.useState({});
-  const [currentUser, setCurrentUser] = React.useState({_id: null, avatar: ''});
+  const [currentUser, setCurrentUser] = React.useState({ _id: null, avatar: '' });
 
   const [loggedIn, setLoggedIn] = React.useState(false)
-  const [message, setMessage] = React.useState({iconPath: '', text: ''})
+  const [message, setMessage] = React.useState({ iconPath: '', text: '' })
   const [email, setEmail] = React.useState('')
   const history = useHistory();
 
@@ -130,13 +130,13 @@ function App() {
     setImagePopupOpen(true)
   }
 
-  function handleUpdateUser({name, about}) {
+  function handleUpdateUser({ name, about }) {
     api.editUserInfo(name, about)
       .then(() => {
-        const updatedUser = {...currentUser};
+        const updatedUser = { ...currentUser };
         updatedUser.name = name;
         updatedUser.about = about;
-        setCurrentUser({...updatedUser});
+        setCurrentUser({ ...updatedUser });
         closeAllPopups();
       })
       .catch((err) => {
@@ -144,7 +144,7 @@ function App() {
       })
   }
 
-  function handleUpdateAvatar({avatar}) {
+  function handleUpdateAvatar({ avatar }) {
     api.editUserAvatar(avatar)
       .then((data) => {
         setCurrentUser(data);
@@ -155,7 +155,7 @@ function App() {
       })
   }
 
-  function handleAddPlaceSubmit({name, link}) {
+  function handleAddPlaceSubmit({ name, link }) {
     api.addCard(name, link)
       .then((card) => {
         setCards([...cards, card]);
@@ -170,12 +170,12 @@ function App() {
     setIsTooltipOpen(true)
   }
 
-  function handleInfoTooltipContent({iconPath, text}) {
-    setMessage({iconPath: iconPath, text: text})
+  function handleInfoTooltipContent({ iconPath, text }) {
+    setMessage({ iconPath: iconPath, text: text })
   }
 
   function handleSignOut() {
-    setCurrentUser({_id: null, avatar: ''})
+    setCurrentUser({ _id: null, avatar: '' })
     setLoggedIn(false);
     localStorage.removeItem('jwt');
     api.updateHeaders()
@@ -183,11 +183,11 @@ function App() {
     history.push('/sign-in')
   }
 
-  function registration({email, password}) {
+  function registration({ email, password }) {
     auth.register(email, password)
       .then((res) => {
         if (res.status === 201 || res.status === 200) {
-          handleInfoTooltipContent({iconPath: registrationOk, text: 'Вы успешно зарегестрировались!'})
+          handleInfoTooltipContent({ iconPath: registrationOk, text: 'Вы успешно зарегестрировались!' })
           handleInfoTooltipOpen();
           setTimeout(history.push, 3000, '/sign-in');
           setTimeout(closeAllPopups, 2500)
@@ -203,16 +203,16 @@ function App() {
 
         }
       }).catch((err) => {
-      handleInfoTooltipContent({iconPath: registrationWrong, text: 'Что-то пошло не так! Попробуйте еще раз!'})
-      handleInfoTooltipOpen()
-      setTimeout(closeAllPopups, 2500);
-      console.log(err)
-    })
+        handleInfoTooltipContent({ iconPath: registrationWrong, text: 'Что-то пошло не так! Попробуйте еще раз!' })
+        handleInfoTooltipOpen()
+        setTimeout(closeAllPopups, 2500);
+        console.log(err)
+      })
   }
 
 
-  function authorization({email, password}) {
-    auth.authorize({email, password})
+  function authorization({ email, password }) {
+    auth.authorize({ email, password })
       .then((data) => {
         if (!data) {
           throw new Error('Произошла ошибка')
@@ -230,16 +230,16 @@ function App() {
             console.log(err)
           });
 
-        handleInfoTooltipContent({iconPath: registrationOk, text: 'Вы успешны авторизованы!'});
+        handleInfoTooltipContent({ iconPath: registrationOk, text: 'Вы успешны авторизованы!' });
         handleInfoTooltipOpen();
         setTimeout(history.push, 3000, '/');
         setTimeout(closeAllPopups, 2500);
       }).catch((err) => {
-      handleInfoTooltipContent({iconPath: registrationWrong, text: 'Что-то пошло не так! Попробуйте еще раз!'})
-      handleInfoTooltipOpen();
-      setTimeout(closeAllPopups, 2500)
-      console.log(err)
-    })
+        handleInfoTooltipContent({ iconPath: registrationWrong, text: 'Что-то пошло не так! Попробуйте еще раз!' })
+        handleInfoTooltipOpen();
+        setTimeout(closeAllPopups, 2500)
+        console.log(err)
+      })
   }
 
   return (
@@ -247,7 +247,7 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
         <div className="page__container">
-          <Header loggedIn={loggedIn} email={email} handleSignOut={handleSignOut}/>
+          <Header loggedIn={loggedIn} email={email} handleSignOut={handleSignOut} />
           <Switch>
             <Route path="/sign-in">
               <Login
@@ -269,16 +269,16 @@ function App() {
             </ProtectedRoute>
 
             <Route path="/">
-              {loggedIn ? <Redirect to="/main"/> : <Redirect to="/sign-in"/>}
+              {loggedIn ? <Redirect to="/main" /> : <Redirect to="/sign-in" />}
             </Route>
           </Switch>
-          <Footer/>
+          <Footer />
           <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups}
-                            onUpdateUser={handleUpdateUser}/>
+            onUpdateUser={handleUpdateUser} />
           <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups}
-                           onUpdateAvatar={handleUpdateAvatar}/>
+            onUpdateAvatar={handleUpdateAvatar} />
           <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups}
-                         onAddPlace={handleAddPlaceSubmit}/>
+            onAddPlace={handleAddPlaceSubmit} />
 
           <PopupWithForm
             title="Вы уверены?"
@@ -289,7 +289,7 @@ function App() {
           <ImagePopup
             card={selectedCard}
             onClose={closeAllPopups}
-            isOpen={isImagePopupOpen}/>
+            isOpen={isImagePopupOpen} />
           <InfoTooltip
             isOpen={isTooltipOpen}
             onClose={closeAllPopups}

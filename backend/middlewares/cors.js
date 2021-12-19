@@ -2,10 +2,10 @@ function cors(req, res, next) {
   const allowedOrigin = [
     'https://mest.michelle.nomoredomains.club',
     'http://mest.michelle.nomoredomains.club',
-    'http://localhost:3001',
-    'https://localhost:3001',
     'http://localhost:3000',
     'https://localhost:3000',
+    'http://localhost:5000',
+    'https://localhost:5000',
     'http://84.201.129.89',
     'https://84.201.129.89',
   ];

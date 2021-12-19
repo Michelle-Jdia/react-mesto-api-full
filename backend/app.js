@@ -10,8 +10,6 @@ const routerCards = require('./routes/cards');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { createUser, login } = require('./controllers/users');
-mongoose.connect('mongodb://localhost:27017/mestodb');
-const { PORT = 3000 } = process.env;
 
 const app = express();
 
@@ -19,8 +17,6 @@ app.use(cors({
   origin: [
     'https://mest.michelle.nomoredomains.club',
     'http://mest.michelle.nomoredomains.club',
-    'http://localhost:3001',
-    'https://localhost:3001',
     'http://localhost:3000',
     'https://localhost:3000',
     'http://84.201.129.89',
@@ -29,10 +25,12 @@ app.use(cors({
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 }));
+const { PORT = 5000 } = process.env;
+const CONNECTION_URL = 'mongodb+srv://admin:admin123@cluster0.cn2lj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
-
 app.use(requestLogger);
 
 app.post('/signup', celebrate({
@@ -84,6 +82,8 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-});
+mongoose.connect(
+  CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true },
+).then(() => {
+  app.listen(PORT, () => console.log(`server is runnig on port: ${PORT}`));
+}).catch((err) => console.log(err.message));

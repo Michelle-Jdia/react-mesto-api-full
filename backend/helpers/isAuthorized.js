@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 const jwt = require('jsonwebtoken');
 
 const { JWT_SECRET } = process.env;

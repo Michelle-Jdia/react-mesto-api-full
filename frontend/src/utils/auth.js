@@ -1,7 +1,6 @@
 import api from './api'
-
-export const BASE_URL = 'https://api.domainname.michelle.nomoredomains.monster';
-
+// process.env.NODE_ENV === 'production' ? 'https://api.domainname.michelle.nomoredomains.monster' : 
+export const BASE_URL = 'http://localhost:5000';
 
 const checkResponse = (res) => {
   if (!res.ok) {
@@ -22,6 +21,7 @@ export const register = (email, password) => {
 };
 
 export const authorize = ({ email, password }) => {
+
   return fetch(`${BASE_URL}/signin`, {
     method: 'POST',
     headers: {
@@ -40,7 +40,6 @@ export const authorize = ({ email, password }) => {
 };
 
 export const getContent = (token) => {
-  console.log(token)
   return fetch(`${BASE_URL}/users/me`, {
     method: 'GET',
     headers: {
