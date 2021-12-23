@@ -10,6 +10,7 @@ const routerCards = require('./routes/cards');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { createUser, login } = require('./controllers/users');
+const { myCors } = require('./middlewares/cors');
 // mongoose.connect('mongodb://localhost:27017/mestodb');
 // const { PORT = 3000 } = process.env;
 const app = express();
@@ -26,6 +27,13 @@ app.use(cors({
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 }));
+
+app.use(myCors)
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Credentials', true);
+//   next();
+// });
+
 const { PORT = 5000 } = process.env;
 const CONNECTION_URL = 'mongodb+srv://admin:admin123@cluster0.cn2lj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
 
@@ -60,6 +68,7 @@ app.get('/crash-test', () => {
 app.use(auth);
 app.use('/', routerUser);
 app.use('/', routerCards);
+
 app.use('*', (req, res, next) => {
   const err = new Error('Cтраница не найдена');
   err.statusCode = 404;

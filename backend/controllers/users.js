@@ -76,18 +76,19 @@ module.exports.findUserById = (req, res, next) => {
 };
 
 module.exports.infoAboutUser = (req, res, next) => {
-  User.findById(req.user._id)
-    .then((user) => {
-      if (!user) {
-        const err = new Error('Пользователь с указанным _id не найден');
-        err.statusCode = 404;
+  res.send({ data: req.user });
+  // User.findById(req.user._id)
+  //   .then((user) => {
+  //     if (!user) {
+  //       const err = new Error('Пользователь с указанным _id не найден');
+  //       err.statusCode = 404;
 
-        next(err);
-      } else {
-        res.send({ data: user });
-      }
-    })
-    .catch(next);
+  //       next(err);
+  //     } else {
+  //       res.send({ data: user });
+  //     }
+  //   })
+  //   .catch(next);
 };
 
 module.exports.updateProfile = (req, res, next) => {
@@ -183,8 +184,8 @@ module.exports.login = (req, res, next) => {
     })
     .then((user) => {
       const { NODE_ENV, JWT_SECRET } = process.env;
-
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'super-strong-secret', { expiresIn: '7d' });
+
       res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,

@@ -93,6 +93,7 @@ function App() {
   React.useEffect(() => {
     const jwt = localStorage.getItem('jwt');
     if (jwt) {
+
       auth.getContent(jwt)
         .then((res) => {
           setLoggedIn(true);
@@ -180,7 +181,7 @@ function App() {
     localStorage.removeItem('jwt');
     api.updateHeaders()
     setEmail('')
-    history.push('/sign-in')
+    history.push('/signin')
   }
 
   function registration({ email, password }) {
@@ -189,7 +190,7 @@ function App() {
         if (res.status === 201 || res.status === 200) {
           handleInfoTooltipContent({ iconPath: registrationOk, text: 'Вы успешно зарегестрировались!' })
           handleInfoTooltipOpen();
-          setTimeout(history.push, 3000, '/sign-in');
+          setTimeout(history.push, 3000, '/signin');
           setTimeout(closeAllPopups, 2500)
         }
         if (res.status === 400) {
@@ -249,7 +250,7 @@ function App() {
         <div className="page__container">
           <Header loggedIn={loggedIn} email={email} handleSignOut={handleSignOut} />
           <Switch>
-            <Route path="/sign-in">
+            <Route path="/signin">
               <Login
                 authorization={authorization}
               />
@@ -269,7 +270,7 @@ function App() {
             </ProtectedRoute>
 
             <Route path="/">
-              {loggedIn ? <Redirect to="/main" /> : <Redirect to="/sign-in" />}
+              {loggedIn ? <Redirect to="/main" /> : <Redirect to="/signin" />}
             </Route>
           </Switch>
           <Footer />

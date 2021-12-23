@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 
 const { JWT_SECRET, NODE_ENV } = process.env;
 module.exports = (req, res, next) => {
+  console.log('aaa', req.cookies)
+
   if (!req.cookies.jwt) {
     const err = new Error('Необходима авторизация');
     err.statusCode = 401;

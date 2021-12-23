@@ -31,21 +31,23 @@ export const authorize = ({ email, password }) => {
     body: JSON.stringify({ email, password })
   }).then(checkResponse)
     .then((data) => {
+ 
       if (data.token) {
         localStorage.setItem('jwt', data.token);
+        document.cookie = `jwt=${data.token};` 
         api.updateHeaders();
         return data.token
       }
     })
 };
 
-export const getContent = (token) => {
+export const getContent = (token) => {  
   return fetch(`${BASE_URL}/users/me`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
-    },
+    }
   })
     .then(checkResponse)
     .then((data) => data)

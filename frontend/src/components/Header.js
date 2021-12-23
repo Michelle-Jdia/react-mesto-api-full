@@ -4,8 +4,8 @@ import React from "react";
 
 function Header({loggedIn, email, handleSignOut}) {
     const {pathname} = useLocation();
-    const text = `${pathname === '/sign-in' ? 'Регистрация' : 'Войти'}`;
-    const linkRoute = `${pathname === '/sign-in' ? '/sign-up' : '/sign-in'}`;
+    const text = `${pathname === '/signin' ? 'Регистрация' : 'Войти'}`;
+    const linkRoute = `${pathname === '/signin' ? '/sign-up' : '/signin'}`;
     return (
         <header className="header">
             <img src={headerLogo} alt="Логотип сайта" className="header__logo"/>

@@ -33,7 +33,7 @@ function Register({registration}) {
                        className="start-screen__input" placeholder="Пароль"/>
                 <button className="start-screen__submit">Зарегестрироваться</button>
             </form>
-            <Link className="start-screen__login" to="/sign-in"> Уже зарегестрированы? Войти</Link>
+            <Link className="start-screen__login" to="/signin"> Уже зарегестрированы? Войти</Link>
         </section>
     );
 }
