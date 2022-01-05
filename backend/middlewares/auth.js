@@ -1,27 +1,27 @@
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const UnauthorizedError = require('../errors/unauthorized-err');
 
-const { JWT_SECRET, NODE_ENV } = process.env;
+// eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
-  console.log('aaa', req.cookies)
+  const token = req.cookies.jwt;
 
-  if (!req.cookies.jwt) {
-    const err = new Error('Необходима авторизация');
-    err.statusCode = 401;
-
-    next(err);
+  if (!token) {
+    throw new UnauthorizedError('Необходима авторизация2');
   }
 
-  const token = (req.cookies.jwt);
+  const { NODE_ENV, JWT_SECRET } = process.env;
   let payload;
 
   try {
-    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'super-strong-secret');
+    payload = jwt.verify(
+      token,
+      NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key',
+    );
   } catch (err) {
-    const errNew = new Error('Ошибка авторизации');
-    errNew.statusCode = 401;
-
-    next(errNew);
+    next(new UnauthorizedError('Необходима авторизация1'));
   }
+
   req.user = payload;
   next();
 };

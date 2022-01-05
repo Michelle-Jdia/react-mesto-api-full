@@ -1,16 +1,15 @@
-import React from "react";
-
-function ImagePopup(props) {
-
-    return (
-        <div className={`popup opened-image ${props.card && props.isOpen ? 'popup__opened' : ''}`}>
-            <div className="popup__photocontainer">
-                <button className="popup__button-close" type="button" onClick={props.onClose}></button>
-                <img src={`${props.card.link}`} alt={props.card.name} className="popup__image"/>
-                <h2 className="popup__phototitle">{props.card.name} </h2>
-            </div>
+function ImagePopup({ card, onClose }) {
+  return (
+    <div className={`popup popup_type_image${Object.keys(card).length ? ' popup_opened' : ''}`} onClick={onClose}>
+      <div className="popup__image-container">
+        <div className="popup__image-overlay">
+          <img src={card.link} className="popup__image" alt={card.name} />
+          <button type="button" className="popup__icon-close" aria-label="Закрыть" onClick={onClose}></button>
+          <p className="popup__image-signature">{card.name}</p>
         </div>
-    )
+      </div>
+    </div>
+  )
 }
 
-export default ImagePopup;
+export default ImagePopup

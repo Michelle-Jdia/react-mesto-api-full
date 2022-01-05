@@ -1,39 +1,66 @@
-import React from 'react';
+import { useState } from 'react'
 
+function Login({ onSubmit }) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isVisiblePassword, setIsVisiblePassword] = useState(false)
 
-function Login({authorization}) {
-    const [valueEmail, setValueEmail] = React.useState('')
-    const [valuePassword, setValuePassword] = React.useState('')
+  function handleChangeEmail(e) {
+    setEmail(e.target.value)
+  }
 
-    function handleChangeEmail(evt) {
-        setValueEmail(evt.target.value)
-    }
+  function handleChangePassword(e) {
+    setPassword(e.target.value)
+  }
 
-    function handleChangePassword(evt) {
-        setValuePassword(evt.target.value)
-    }
+  function handleLoginSubmit(e) {
+    e.preventDefault()
+    onSubmit({
+      password,
+      email,
+    })
+  }
 
-    function handleSubmit(evt) {
-        evt.preventDefault()
-        const email = valueEmail;
-        const password = valuePassword;
+  function handlerChangeVisiblePassword() {
+    isVisiblePassword ? setIsVisiblePassword(false) : setIsVisiblePassword(true);
+  }
 
-        authorization({email, password})
-    }
+  return (
+    <form method="POST" className="form" name="login" onSubmit={handleLoginSubmit}>
+      <h3 className="form__title">Вход</h3>
 
-
-    return (
-        <section className="start-screen">
-            <h1 className="start-screen__title">Вход</h1>
-            <form onSubmit={handleSubmit} className="start-screen__form">
-                <input value={valueEmail} className="start-screen__input" placeholder="Email"
-                       onChange={handleChangeEmail}/>
-                <input value={valuePassword} className="start-screen__input" placeholder="Пароль"
-                       onChange={handleChangePassword}/>
-                <button className="start-screen__submit">Войти</button>
-            </form>
-        </section>
-    );
+      <input
+        placeholder="Email"
+        type="email"
+        className="form__input"
+        name="email"
+        required
+        minLength="2"
+        maxLength="40"
+        value={email || ''}
+        onChange={handleChangeEmail}
+      />
+      <span className="form__error email-input-error"></span>
+      <div className="form__password-overlay">
+        <input
+          placeholder="Пароль"
+          type={isVisiblePassword ? "text" : "password"}
+          className="form__input"
+          name="password"
+          required
+          minLength="8"
+          maxLength="200"
+          value={password || ''}
+          onChange={handleChangePassword}
+        />
+        <span className={`form__password-control${isVisiblePassword ? ' visible' : ''}`} onClick={handlerChangeVisiblePassword}></span>
+      </div>
+      <span className="form__error password-input-error"></span>
+      <button type="submit" className="form__submit-button">
+        Войти
+      </button>
+    </form>
+  )
 }
 
-export default Login;
+export default Login

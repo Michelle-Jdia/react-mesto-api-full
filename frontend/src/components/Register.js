@@ -1,41 +1,111 @@
-import React from 'react';
-import {Link} from "react-router-dom";
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
+function Register({ onSubmit }) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [passwordRepeat, setPasswordRepeat] = useState('')
+  const [isVisiblePassword, setIsVisiblePassword] = useState(false)
+  const [passwordRepeatErrorText, setPasswordRepeatErrorText] = useState('')
+  const [isPasswordMatch, setIsPasswordMatch] = useState(false)
 
-function Register({registration}) {
+  function handleChangeEmail(e) {
+    setEmail(e.target.value)
+  }
 
-    const [valueEmail, setValueEmail] = React.useState('')
-    const [valuePassword, setValuePassword] = React.useState('')
+  function handleChangePassword(e) {
+    setPassword(e.target.value)
+  }
 
-    function handleChangeEmail(evt) {
-        setValueEmail(evt.target.value)
+  function handleRegisterSubmit(e) {
+    e.preventDefault()
+    if (isPasswordMatch) {
+      onSubmit({
+        password,
+        email,
+      })
+    } else {
+      setPasswordRepeatErrorText('Пароли не совпадают');
     }
+  }
 
-    function handleChangePassword(evt) {
-        setValuePassword(evt.target.value)
-    }
+  function handlerChangeVisiblePassword() {
+    isVisiblePassword ? setIsVisiblePassword(false) : setIsVisiblePassword(true);
+  }
 
-    function handleSubmit(evt) {
-        evt.preventDefault()
-        const email = valueEmail;
-        const password = valuePassword;
+  function handleChangePasswordRepeat(e) {
+    setPasswordRepeat(e.target.value)
+  }
 
-        registration({email,password})
-    }
+  useEffect(() => {
+    passwordRepeat === password ? setIsPasswordMatch(true) : setIsPasswordMatch(false);
+    console.log(passwordRepeat ? true : false)
+  }, [passwordRepeat, password])
 
-    return (
-        <section className="start-screen">
-            <h1 className="start-screen__title">Регистрация</h1>
-            <form onSubmit={handleSubmit} className="start-screen__form">
-                <input value={valueEmail} onChange={handleChangeEmail} type="email" className="start-screen__input"
-                       placeholder="Email"/>
-                <input value={valuePassword} onChange={handleChangePassword} type="password"
-                       className="start-screen__input" placeholder="Пароль"/>
-                <button className="start-screen__submit">Зарегестрироваться</button>
-            </form>
-            <Link className="start-screen__login" to="/signin"> Уже зарегестрированы? Войти</Link>
-        </section>
-    );
+  useEffect(() => {
+    isPasswordMatch ? setPasswordRepeatErrorText('') : setPasswordRepeatErrorText('Пароли не совпадают');
+  }, [isPasswordMatch])
+
+  return (
+    <form method="POST" className="form" name="register" onSubmit={handleRegisterSubmit}>
+      <h3 className="form__title">Регистрация</h3>
+
+      <input
+        placeholder="Email"
+        type="email"
+        className="form__input"
+        name="email"
+        required
+        minLength="2"
+        maxLength="40"
+        value={email || ''}
+        onChange={handleChangeEmail}
+      />
+      <span className="form__error email-input-error"></span>
+
+      <div className="form__password-overlay">
+        <input
+          placeholder="Пароль"
+          type={isVisiblePassword ? "text" : "password"}
+          className="form__input"
+          name="password"
+          required
+          minLength="8"
+          maxLength="200"
+          value={password || ''}
+          onChange={handleChangePassword}
+        />
+        <span className={`form__password-control${isVisiblePassword ? ' visible' : ''}`} onClick={handlerChangeVisiblePassword}></span>
+      </div>
+      <span className="form__error password-input-error"></span>
+
+      {!isVisiblePassword && (
+        <>
+          <input
+            placeholder="Повторите пароль"
+            type="password"
+            className="form__input"
+            name="repeat-password"
+            required
+            value={passwordRepeat || ''}
+            onChange={handleChangePasswordRepeat}
+          />
+          <span className="form__error repeat-password-input-error">{passwordRepeat ? passwordRepeatErrorText : ''}</span>
+        </>
+      )}
+
+
+      <button type="submit" className="form__submit-button">
+        Зарегистрироваться
+      </button>
+      <p className="form__text">
+        Уже зарегистрированы?{' '}
+        <Link to="/sign-in" className="form__link">
+          Войти
+        </Link>
+      </p>
+    </form>
+  )
 }
 
-export default Register;
+export default Register

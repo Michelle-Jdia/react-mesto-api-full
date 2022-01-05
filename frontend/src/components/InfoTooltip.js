@@ -1,16 +1,12 @@
-import React from 'react';
-
-
-function InfoTooltip({onClose, isOpen, message}) {
-    return (
-        <div className={`popup popup_type_infotool ${isOpen ? 'popup__opened' : ''}`}>
-            <div className="popup__container">
-                <img src={message.iconPath} alt="Картинка Yes или No" className="popup__result-icon"/>
-                <p className="popup__title-info">{message.text}</p>
-                <button type="button" className="popup__button-close" onClick={onClose}/>
-            </div>
-        </div>
-    );
+function InfoTooltip({ message, isError, onClose }) {
+  return (
+    <div className={`popup popup_type_info${message !== '' ? ' popup_opened' : ''}`} onClick={onClose}>
+      <div className={`popup__container${isError ? ' popup__container_image_error' : ' popup__container_image_complete'}`}>
+        <button type="button" className="popup__icon-close" aria-label="Закрыть" onClick={onClose}></button>
+        <h3 className="popup__heading popup__heading_type_message">{message}</h3>
+      </div>
+    </div>
+  )
 }
 
-export default InfoTooltip;
+export default InfoTooltip

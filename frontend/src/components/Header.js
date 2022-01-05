@@ -1,24 +1,58 @@
-import headerLogo from '../images/logo__header.svg'
-import {Link, useLocation} from "react-router-dom";
-import React from "react";
+import logo from '../images/logo.svg'
+import { Link } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
+import { useState } from 'react'
 
-function Header({loggedIn, email, handleSignOut}) {
-    const {pathname} = useLocation();
-    const text = `${pathname === '/signin' ? 'Регистрация' : 'Войти'}`;
-    const linkRoute = `${pathname === '/signin' ? '/sign-up' : '/signin'}`;
-    return (
-        <header className="header">
-            <img src={headerLogo} alt="Логотип сайта" className="header__logo"/>
-            <div className="header__wrap">
-                {loggedIn ? (
-                        <>
-                            <p className="header__email">{email}</p>
-                            <Link className="header__signout" to="" onClick={handleSignOut}>Выйти</Link>
-                        </>)
-                    : (<Link className="header__link" to={linkRoute}>{text}</Link>)}
-            </div>
-        </header>
-    );
+function Header({ userAuth, onLogout }) {
+  const [isActiveProfile, setActiveProfile] = useState(false)
+
+  function handleBurgerMenuClick() {
+    setActiveProfile(!isActiveProfile)
+  }
+
+  return (
+    <>
+      <Route exact path="/">
+        <div className={`header__profile-top${isActiveProfile ? ' header__profile-top_opened' : ''}`}>
+          <p className="header__email">{userAuth.email}</p>
+          <Link to="/sign-in" className="header__link header__link_color_grey" onClick={onLogout}>
+            Выйти
+          </Link>
+        </div>
+      </Route>
+
+      <header className="header page__header">
+        <img src={logo} alt="Логотип Mesto" className="header__logo" />
+
+        <nav className="header__nav">
+          <Switch>
+            <Route path="/sign-up">
+              <Link to="/sign-in" className="header__link">
+                Войти
+              </Link>
+            </Route>
+            <Route path="/sign-in">
+              <Link to="/sign-up" className="header__link">
+                Регистрация
+              </Link>
+            </Route>
+            <Route exact path="/">
+              <div
+                className={`header__burger-menu-button${isActiveProfile ? ' header__burger-menu-button_icon_close' : ''}`}
+                onClick={handleBurgerMenuClick}
+              />
+              <div className="header__profile-right">
+                <p className="header__email">{userAuth.email}</p>
+                <Link to="/sign-in" className="header__link header__link_color_grey" onClick={onLogout}>
+                  Выйти
+                </Link>
+              </div>
+            </Route>
+          </Switch>
+        </nav>
+      </header>
+    </>
+  )
 }
 
-export default Header;
+export default Header

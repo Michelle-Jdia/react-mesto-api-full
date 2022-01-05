@@ -1,15 +1,19 @@
 .header {
-    margin-top: 45px;
-    padding-bottom: 41px;
-    border-bottom: 1px solid rgba(84, 84, 84, 0.7);
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
+  max-width: 880px;
+  width: 100%;
+  border-bottom: 1px rgba(84, 84, 84, 0.7) solid;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 41px;
+  padding-top: 45px;
+
 }
 
-@media screen and (max-width: 560px) {
-    .header {
-        margin-top: 28px;
-        padding-bottom: 31.6px;
-    }
+@media (max-width: 918px) {
+  .header {
+    padding-top: 28px;
+    max-width: 918px;
+    padding-bottom: 32px;
+  }
 }

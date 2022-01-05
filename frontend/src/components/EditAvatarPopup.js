@@ -1,36 +1,37 @@
-import React from "react";
-import PopupWithForm from "./PopupWithForm";
-// import {CurrentUserContext} from "../contexts/CurrentUserContext";
+import React from 'react'
+import PopupWithForm from './PopupWithForm'
 
-function EditAvatarPopup({isOpen, onClose, onUpdateAvatar}) {
+function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
+  const avatarRef = React.useRef()
 
-    //const currentUser = React.useContext(CurrentUserContext);
-    const avatarInput = React.useRef();
+  function handleOnChangeAvatar(e) {
+    e.preventDefault()
+    onUpdateAvatar({
+      avatar: avatarRef.current.value,
+    })
+  }
 
-    function handleSubmit(evt) {
-        evt.preventDefault();
-        onUpdateAvatar({
-            avatar: avatarInput.current.value,
-        })
-    }
+  return (
+    <PopupWithForm
+      name="avatar"
+      title="Обновить аватар"
+      buttonText="Сохранить"
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={handleOnChangeAvatar}
+    >
+      <input
+        ref={avatarRef}
+        placeholder="Ссылка на фото"
+        type="url"
+        className="popup__input popup__input_type_link"
+        name="avatar"
+        required
+        id="avatar-input"
+      />
+      <span className="popup__error avatar-input-error"></span>
+    </PopupWithForm>
+  )
+}
 
-    // React.useEffect(()=> {
-    //     avatarInput.current.value = currentUser.avatar;
-    // }, [''])
-
-    return (
-        <PopupWithForm
-            title="Обновить аватар"
-            name="avatar"
-            buttonText="Сохранить"
-            isOpen={isOpen}
-            onClose={onClose}
-            handleSubmit={handleSubmit}>
-            <input type="url" className="popup__field popup__avatar-link" id="form-avatar-input" name="link"
-                   placeholder="Ссылка на аватар" ref={avatarInput} required/>
-            <span className="form-avatar-input-error"> </span>
-        </PopupWithForm>
-    )
-};
-
-export default EditAvatarPopup;
+export default EditAvatarPopup

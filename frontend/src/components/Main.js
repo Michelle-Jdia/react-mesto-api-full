@@ -1,42 +1,57 @@
-import plusButton from '../images/plusButton.svg'
+import React, { useEffect, useState } from 'react'
+import { CurrentUserContext } from '../contexts/CurrentUserContext'
+import Card from './Card'
 
-import React from "react";
-import Card from "./Card";
-import {CurrentUserContext} from "../contexts/CurrentUserContext";
+function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick, cards, onCardLike, onCardDelete }) {
+  const currentUser = React.useContext(CurrentUserContext)
+  const [sortedCards, setSortedCards] = useState([])
 
-function Main(props) {
+  // sort array
+  useEffect(() => {
+    const newArrCards = cards.sort((a, b) => {
+      let c = new Date(a.createdAt);
+      let d = new Date(b.createdAt);
+      return d - c;
+    });
+    setSortedCards(newArrCards);
+  }, [cards])
 
-    const {onEditAvatar, onAddPlace, onEditProfile, onCardClick, onCardLike, onCardDelete, cards} = props;
-
-    const currentUser = React.useContext(CurrentUserContext);
-
-    return (
-        <main className="main">
-            <section className="profile">
-                <div className="profile__avatar-container">
-                    <img src={currentUser.avatar} alt="Фото Аватара" className="profile__avatar"/>
-                    <button className="profile__avatar-edit" type="button" onClick={onEditAvatar}> </button>
-                </div>
-                <div className="profile__info">
-                    <div className="profile__edit">
-                        <h1 className="profile__name">{currentUser.name}</h1>
-                        <button className="profile__button-edit" type="button"
-                                onClick={onEditProfile}> </button>
-                    </div>
-                    <p className="profile__profession">{currentUser.about}</p>
-                </div>
-                <button className="profile__button-add" type="button" onClick={onAddPlace}>
-                    <img src={plusButton} alt="Значок плюса"/>
-                </button>
-            </section>
-            <section className="elements">
-                {cards.map((card) =>
-                  (<Card key={card._id} card={card} onCardClick={onCardClick}
-                                          onCardLike={onCardLike} onCardDelete={onCardDelete}/>))}
-            </section>
-        </main>
-    )
+  return (
+    <main className="content">
+      <section className="profile">
+        <div className="profile__author">
+          <img className="profile__avatar" src={currentUser.avatar} alt={`Аватар ${currentUser.name}`} />
+          <div className="profile__overlay-avatar" onClick={onEditAvatar}></div>
+          <div className="profile__text">
+            <div className="profile__title-overlay">
+              <h1 className="profile__title">{currentUser.name}</h1>
+              <button
+                type="button"
+                className="profile__edit-button"
+                aria-label="Редактировать"
+                onClick={onEditProfile}
+              ></button>
+            </div>
+            <p className="profile__subtitle">{currentUser.about}</p>
+          </div>
+        </div>
+        <button type="button" className="profile__add-button" aria-label="Добавить" onClick={onAddPlace}></button>
+      </section>
+      <section className="elements">
+        <ul className="elements__list">
+          {sortedCards.map((card) => (
+            <Card
+              key={card._id}
+              card={card}
+              onCardClick={onCardClick}
+              onCardLike={onCardLike}
+              onCardDelete={onCardDelete}
+            />
+          ))}
+        </ul>
+      </section>
+    </main>
+  )
 }
 
-
-export default Main;
+export default Main

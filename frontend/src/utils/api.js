@@ -1,104 +1,84 @@
+import { linkBackend } from './constants';
+
 class Api {
-  constructor({ address, headers }) {
-    this._address = address
-    this._headers = headers
-
+  constructor(options) {
+    this._baseUrl = options.baseUrl
+    this._headers = options.headers
   }
 
-  getInitialCards() {
-    return fetch(`${this._address}/cards`, {
-      headers: this._headers
-    }).then(this._checkResponse)
+  // обработчик ответа
+  _handleResponse(res) {
+    if (res.ok) {
+      return res.json()
+    }
+    return Promise.reject(`Произошла ошибка: ${res.status}`)
   }
 
-  getUserInfo() {
-    return fetch(`${this._address}/users/me`, {
-      headers: this._headers
-    }).then(this._checkResponse)
-  }
-
-  editUserInfo(name, about) {
-    return fetch(`${this._address}/users/me`, {
-      method: 'PATCH',
+  // получение карточек
+  getCards() {
+    return fetch(`${this._baseUrl}/cards`, {
+      method: 'GET',
+      credentials: 'include',
       headers: this._headers,
-      body: JSON.stringify({
-        name: name,
-        about: about
-      })
-    }).then(this._checkResponse)
+    }).then(this._handleResponse)
   }
 
-  addCard(name, link) {
-    return fetch(`${this._address}/cards`, {
+  // добавление карточки
+  addCard(dataCard) {
+    return fetch(`${this._baseUrl}/cards`, {
       method: 'POST',
+      credentials: 'include',
       headers: this._headers,
-      body: JSON.stringify({
-        name: name,
-        link: link
-      })
-    }).then(this._checkResponse)
+      body: JSON.stringify(dataCard),
+    }).then(this._handleResponse)
   }
 
-  editUserAvatar(url) {
-    console.log(url)
-    return fetch(`${this._address}/users/me/avatar`, {
+  getProfile() {
+    return fetch(`${this._baseUrl}/users/me`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: this._headers,
+    }).then(this._handleResponse)
+  }
+
+  addProfile(dataNewAuthor) {
+    return fetch(`${this._baseUrl}/users/me`, {
       method: 'PATCH',
+      credentials: 'include',
       headers: this._headers,
-      body: JSON.stringify({
-        avatar: url
-      })
-    }).then(this._checkResponse)
+      body: JSON.stringify(dataNewAuthor),
+    }).then(this._handleResponse)
   }
 
-  likeCard(cardId) {
-    return fetch(`${this._address}/cards/${cardId}/likes`, {
-      method: 'PUT',
-      headers: this._headers
-    }).then(this._checkResponse)
-  }
-
-  dislikeCard(cardId) {
-    return fetch(`${this._address}/cards/${cardId}/likes`, {
+  deleteCard(cardId) {
+    return fetch(`${this._baseUrl}/cards/${cardId}`, {
       method: 'DELETE',
-      headers: this._headers
-    }).then(this._checkResponse)
+      credentials: 'include',
+      headers: this._headers,
+    }).then(this._handleResponse)
   }
 
   changeLikeCardStatus(cardId, isLiked) {
-    if (isLiked) {
-      return this.dislikeCard(cardId)
-    } else {
-      return this.likeCard(cardId)
-    }
+    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+      method: `${isLiked ? 'DELETE' : 'PUT'}`,
+      credentials: 'include',
+      headers: this._headers,
+    }).then(this._handleResponse)
   }
 
-  removeCard(cardId) {
-    return fetch(`${this._address}/cards/${cardId}`, {
-      method: 'DELETE',
-      headers: this._headers
-    }).then(this._checkResponse)
-  }
-
-  _checkResponse(res) {
-    if (!res.ok) {
-      return Promise.reject(`Ошибка ${res.status}`);
-    }
-    return res.json();
-  }
-  updateHeaders() {
-    this._headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('jwt')}`
-    }
+  updateAvatar(avatar) {
+    return fetch(`${this._baseUrl}/users/me/avatar`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: this._headers,
+      body: JSON.stringify(avatar),
+    }).then(this._handleResponse)
   }
 }
-// process.env.NODE_ENV === 'production' ? 'https://api.domainname.michelle.nomoredomains.monster' :
-const api = new Api({
-  address: 'http://localhost:5000',
-  headers: {
-    'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
-    'Content-type': 'application/json',
-  }
-})
 
-export default api
+export const api = new Api({
+  baseUrl: linkBackend,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
