@@ -33,17 +33,17 @@ const options = {
   credentials: true,
 };
 
-app.use('*', cors(options)); // ПЕРВЫМ!
+app.use('*', cors(options));
 
 app.use(cookieParser());
 app.use(express.json());
 
-app.use(requestLogger); // подключаем логгер запросов
+app.use(requestLogger);
 
 app.post(
   '/signup',
   celebrate({
-    // валидируем body
+
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
@@ -59,7 +59,7 @@ app.post(
 app.post(
   '/signin',
   celebrate({
-    // валидируем body
+
     body: Joi.object().keys({
       email: Joi.string().required().email(),
       password: Joi.string()
@@ -81,15 +81,14 @@ app.get('/logout', (req, res, next) => {
   next();
 });
 
-// авторизация
 app.use(auth);
 
-app.use(router); // запускаем роутер
+app.use(router);
 
-app.use(errorLogger); // подключаем логгер ошибок
+app.use(errorLogger);
 
-app.use(errors()); // обработчик ошибок celebrate
-app.use(centralizedErrors); // централизованная обработка ошибок
+app.use(errors());
+app.use(centralizedErrors);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
